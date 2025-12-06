@@ -3,11 +3,9 @@ import requests
 import pandas as pd
 import time
 
-# Secrets from environment variables (safe)
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHAT_ID   = os.getenv('CHAT_ID')
 
-# Top 100 coins
 TOP_100 = [
     "BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","TRXUSDT","AVAXUSDT","SHIBUSDT",
     "LINKUSDT","DOTUSDT","TONUSDT","MATICUSDT","LTCUSDT","BCHUSDT","NEARUSDT","HBARUSDT","ICPUSDT","APTUSDT",
@@ -58,24 +56,28 @@ def ut_bot_alerts(df):
 
 last_signal = {}
 
-print("UT Bot Top-100 LIVE 24/7! 🚀")
-tg("Bot started – monitoring Top 100 coins! 🚀")
-
-while True:
-    for pair in TOP_100:
-        df = get_data(pair)
-        if df is None or len(df) < 50:
-            continue
-        buy_now, sell_now = ut_bot_alerts(df)
-        signal = "BUY" if buy_now else "SELL" if sell_now else None
-        if signal and last_signal.get(pair) != signal:
-            change, price = get_price_change(pair)
-            arrow = "Long" if signal == "BUY" else "Short"
-            msg = f"""*{signal} SIGNAL {arrow}*
+def run_bot():
+    print("UT Bot Top-100 LIVE 24/7! 🚀")
+    tg("Bot started – monitoring Top 100 coins! 🚀")
+    while True:
+        for pair in TOP_100:
+            df = get_data(pair)
+            if df is None or len(df) < 50:
+                continue
+            buy_now, sell_now = ut_bot_alerts(df)
+            signal = "BUY" if buy_now else "SELL" if sell_now else None
+            if signal and last_signal.get(pair) != signal:
+                change, price = get_price_change(pair)
+                arrow = "Long" if signal == "BUY" else "Short"
+                msg = f"""*{signal} SIGNAL {arrow}*
 `{pair.replace('USDT','')}/USDT` • 5m
 *Price:* `{price:,.4f}`   {f'+{change:.2f}%' if change>0 else f'{change:.2f}%'}
 *UT Bot (key=2)* fired! 🔥"""
-            tg(msg)
-            print(f"{pair} → {signal}")
-            last_signal[pair] = signal
-    time.sleep(7)
+                tg(msg)
+                print(f"{pair} → {signal}")
+                last_signal[pair] = signal
+        time.sleep(7)
+
+# ONLY THIS LINE AT THE VERY BOTTOM
+if __name__ == "__main__":
+    run_bot()
