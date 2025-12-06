@@ -1,16 +1,16 @@
-app = "ut-bot-top100"          # ← YOUR APP NAME (from Fly.io URL)
-primary_region = "cdg"         # ← YOUR REGION (from logs, e.g., "cdg")
+app = "ut-bot-top100"          # Your app name
+primary_region = "cdg"         # Your region from logs
 
 [build]
   builder = "paketobuildpacks/builder:base"
   buildpacks = ["gcr.io/paketo-buildpacks/python"]
 
 [processes]
-  worker = "python main.py"    # ← Defines your bot as the "worker" process
+  worker = "python main.py"
 
 [[vm]]
-  cpu_kind = "shared"
-  cpus = 1
+  cpu_kind = "shared"          # Shared CPU (1 core max for free)
+  cpus = 1                     # Explicitly 1 core
   memory_mb = 256
 
-# No [services] or [http_service] – this is a pure background worker
+# No services – pure background worker
